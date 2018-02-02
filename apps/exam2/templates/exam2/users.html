@@ -1,0 +1,8 @@
+<p><a href='/logout'>logout</a></p>
+<p><a href='/quotes'>Dashboard</a></p>
+<h1>Posts by {{user.name}}</h1>
+<br>
+{% for quote in quotes %}
+        {{quote.author}} - {{quote.content}} 
+        <hr>
+{% endfor %}

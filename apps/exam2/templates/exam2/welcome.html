@@ -1,0 +1,40 @@
+welcome
+
+<p><a href="/logout">logout</a></p>
+<strong>Welcome, {{user.name}}!</strong>
+{% for success in messages %}
+    <div class="alert alert-success" role="alert">
+        <strong>{{ success }}</strong> 
+    </div>
+{% endfor %}
+<h2>Quotable Quotes</h2>
+
+{% for quote in quotes %}
+    {% if quote not in faves %}
+    <p>{{quote.author}} {{quote.content}}</p>
+    <p><a href=/users/{{quote.user.id}}>{{quote.user.name}}</a></p>
+    <form action="/add" method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="add" name="quote" value="{{quote.id}}">
+        <input type="submit" id="submit" value="Add to My List">
+    </form>
+    <hr>
+    {%endif%}
+{%endfor%}
+<h2>Your Favorites</h2>
+{%for faves in faves%}
+    <p>{{faves.author}} {{faves.content}}</p>
+    <p><a href=/users/{{faves.user.id}}>{{faves.user.name}}</a></p>
+    <p><a href=/remove/{{faves.id}}>Remove From My List</a></p>
+{%endfor%}
+    <hr>
+
+<h2>Contribute a Quote:</h2>
+<form action="/create/{{user.id}}" method="POST">
+    {% csrf_token %}
+    Author: <input type="text" id="author" name="author">
+    <br>
+    Message: <input type="textbox" id="content" name="content">
+    <br>
+    <input type="submit" id="submit" value="Submit Quote">
+</form>

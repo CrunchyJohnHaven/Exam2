@@ -1,0 +1,45 @@
+login
+
+<html>
+    <head>
+        {% if messages %}
+            {% for error in messages %}
+                
+                    <p><strong>{{error}}</strong></p>
+                  
+            {% endfor %}
+        {% endif %}
+
+        <title>Login/Registration</title>
+
+    </head>
+    <body>
+        <h1>Register</h1>
+        <form action='/reg' method='POST'>
+            {% csrf_token %}
+            Name:<input type="text" id="name" name="name">
+            <br>
+            Alias:<input type="text" id="alias" name="alias">
+            <br>
+            Email:<input type="email" id="email" name="email">
+            <br>
+            Password:<input type="password" id="password" name="password">
+            <br>
+            Confirm Password:<input type="password" id="confirmPW" name="confirmPW">
+            <br>
+            Date of Birth:<input type="date" id="DOB" name="DOB">
+            <br>
+            <input type="submit" value="Register">
+        </form>
+        <br>
+        <h1>Login</h1>
+        <form action='/login' method='POST'>
+            {% csrf_token %}
+            Email:<input type="email" id="email" name="email">
+            <br>
+            Password:<input type="password" id="password" name="password">
+            <br>
+            <input type="submit" value="Login">
+        </form>
+    </body>
+</html>
