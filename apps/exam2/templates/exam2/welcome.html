@@ -1,18 +1,140 @@
-welcome
-
 <p><a href="/logout">logout</a></p>
-<strong>Welcome, {{user.name}}!</strong>
+<h1>Hello, {{user.name}}!</h1>
 {% for success in messages %}
     <div class="alert alert-success" role="alert">
         <strong>{{ success }}</strong> 
     </div>
 {% endfor %}
-<h2>Quotable Quotes</h2>
+<!-- <h2>NOTES</h2>
+<p><a href="/destination/{{user.id}}">User.html</a></p>
+<p><a href="/page1/{{user.id}}">Page1.html</a></p>
+<p>ID:  {{user.id}}</p>
+<p>NAME:  {{user.name}}</p>
+<p>ALIAS:   {{user.alias}}</p>
+<p>PASSWORD:   {{user.password}}</p>
+<p>CREATED_AT:   {{user.created_at}}</p>
+<p>UPDATED_AT:   {{user.updated_at}}</p>
+ID: 17
 
-{% for quote in quotes %}
+NAME: Bravo
+
+ALIAS:
+
+PASSWORD: $2b$05$RPLyuS52ZipTPoCikm6XzOMCa5Cq5r9xIKwRPbvPwg3SvJKOM9AA2
+
+CREATED_AT: Feb. 2, 2018
+
+UPDATED_AT: Feb. 2, 2018
+
+DATEFIELD.NOW: Feb. 3, 2018, 12:18 a.m.
+
+Feb. 2, 2018 -->
+<!-- 
+
+
+<p>DATEFIELD.NOW: {{now}}</p>
+
+{% if user.created_at == user.created_at %}
+    {{user.created_at}}
+{%endif%}
+
+DATEFIELD.NOW: Feb. 3, 2018, 12:19 a.m.
+
+Feb. 2, 2018 -->
+
+<h1>Your Trip Schedules</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th><strong>Destination</strong></th>
+            <th><strong>Travel Start Date</strong></th>
+            <th><strong>Travel End Date</strong></th>
+            <th><strong>Plan</strong></th>
+            <th><strong>Leave the Trip</strong></th>
+        </tr>
+    </thead>
+    {%for trip in my_trips%}
+    <tbody>
+        <tr>
+            
+                <!-- <th scope="row">1</th> -->
+                <td><a href='/travels/destination/{{trip.id}}'>{{trip.destination}}</a></td>
+                <td>{{trip.start_date}}</td>
+                <td>{{trip.end_date}}</td>
+                <td>{{trip.description}}</td>
+                <td><a href=/remove/{{trip.id}}>Remove From My List</a</td>
+            
+        </tr>
+    </tbody>
+    {%endfor%}
+
+</table>
+<hr>
+<h1>Other User's Travel Plans</h1>
+<table class="table">
+        <thead>
+            <tr>
+                <th><strong>Name</strong></th>
+                <th><strong>Destination</strong></th>
+                <th><strong>Travel Start Date</strong></th>
+                <th><strong>Travel End Date</strong></th>
+                <th><strong>Do You Want to Join?</strong></th>
+            </tr>
+        </thead>
+        {%for trip in other_trips%}
+            {%if trip not in my_trips%}
+                <tbody>
+                    <tr>
+                        <td>{{trip.user.name}}</td>
+                        <td><a href='/travels/destination/{{trip.id}}'>{{trip.destination}}</a></td>
+                        <td>{{trip.end_date}}</td>
+                        <td>{{trip.description}}</td>
+                        <td><a href='/add/{{trip.id}}'>Join</a></td>
+                    </tr>
+                </tbody>
+            {%endif%}
+        {%endfor%}
+</table>
+<hr>
+
+<p><a href='add'>Add Travel Plans</a></p>
+
+
+
+
+<!-- 
+
+{%for trip in other_trips%}
+    {%if trip not in my_trips%}
+    <p>Destination: <a href='/travels/destination/{{trip.id}}'>{{trip.destination}}</a></p>
+    <p>Travel Start Date: {{trip.start_date}}</p>
+    <p>Travel End Date: {{trip.end_date}}</p>
+    <p>Plan: {{trip.description}}</p>
+    <form action="/add" method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="add" name="trip" value="{{trip.id}}">
+        <input type="submit" id="submit" value="Join">
+    </form>
+        <hr>
+    {%endif%}
+{%endfor%}
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ///////////////////// -->
+<!-- {% for quote in quotes %}
     {% if quote not in faves %}
     <p>{{quote.author}} {{quote.content}}</p>
-    <p><a href=/users/{{quote.user.id}}>{{quote.user.name}}</a></p>
+    <p><a href=/destination/{{quote.user.id}}>{{quote.user.name}}</a></p>
     <form action="/add" method="POST">
         {% csrf_token %}
         <input type="hidden" id="add" name="quote" value="{{quote.id}}">
@@ -24,7 +146,7 @@ welcome
 <h2>Your Favorites</h2>
 {%for faves in faves%}
     <p>{{faves.author}} {{faves.content}}</p>
-    <p><a href=/users/{{faves.user.id}}>{{faves.user.name}}</a></p>
+    <p><a href=/destination/{{faves.user.id}}>{{faves.user.name}}</a></p>
     <p><a href=/remove/{{faves.id}}>Remove From My List</a></p>
 {%endfor%}
     <hr>
@@ -37,4 +159,4 @@ welcome
     Message: <input type="textbox" id="content" name="content">
     <br>
     <input type="submit" id="submit" value="Submit Quote">
-</form>
+</form> -->

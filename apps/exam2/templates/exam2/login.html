@@ -1,4 +1,3 @@
-login
 
 <html>
     <head>
@@ -19,15 +18,11 @@ login
             {% csrf_token %}
             Name:<input type="text" id="name" name="name">
             <br>
-            Alias:<input type="text" id="alias" name="alias">
-            <br>
-            Email:<input type="email" id="email" name="email">
+            Username:<input type="text" id="username" name="username">
             <br>
             Password:<input type="password" id="password" name="password">
             <br>
             Confirm Password:<input type="password" id="confirmPW" name="confirmPW">
-            <br>
-            Date of Birth:<input type="date" id="DOB" name="DOB">
             <br>
             <input type="submit" value="Register">
         </form>
@@ -35,7 +30,7 @@ login
         <h1>Login</h1>
         <form action='/login' method='POST'>
             {% csrf_token %}
-            Email:<input type="email" id="email" name="email">
+            Username:<input type="username" id="username" name="username">
             <br>
             Password:<input type="password" id="password" name="password">
             <br>

@@ -2,6 +2,10 @@ from __future__ import unicode_literals
 import re
 import bcrypt
 from django.db import models
+from datetime import date
+
+
+
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 my_re = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
@@ -11,8 +15,8 @@ class UserManager(models.Manager):
     def login_validator(self, postData):
         print "Start Login Manager"
         errors = {}
-        if len(User.objects.filter(email=postData['email'])) > 0:
-            user = self.filter(email=postData['email'])[0]
+        if len(User.objects.filter(username=postData['username'])) > 0:
+            user = self.filter(username=postData['username'])[0]
             if not bcrypt.checkpw(postData['password'].encode(), user.password.encode()):
                 errors['regPW'] = "Password is incorrect"
                 print "End Login Manager - Password Invalid"
@@ -21,101 +25,167 @@ class UserManager(models.Manager):
                 print "End Login Manager - Validated"
                 return user
         else:
-            errors['regEmail'] = "Email not registered"
-            # print "regEmail errors: ", errors
+            errors['username'] = "username not registered"
+            print "username errors: ", errors
             print "End Login Manager"
             return errors
 
     def reg_validator(self, postData):
         print "Start Reg Manager"
         errors = {}
-        if len(postData['name']) < 2:
-            errors['name'] = "Name must be at least two characters"
+        if len(User.objects.filter(username=postData['username'])) > 0:
+            errors['email2'] = "Username already registered"
+            # print "errors at email2", errors
+        if len(postData['name']) < 3:
+            errors['name'] = "Name must be at least three characters"
             # print "errors name:", errors
-        if len(postData['alias']) < 2:
-            errors['alias'] = "Alias must be at least two characters"
-            # print "errors at alias:", errors
-        if not re.match(EMAIL_REGEX, postData['email']):
-            errors['email'] = "email is invalid"
-            # print "errrors at email", errors
+        if len(postData['username']) < 3:
+            errors['username'] = "Username must be at least three characters"
         if len(postData['password']) < 8:
             errors['password'] = "Password must be at least 8 characters"
             # print "errors at password:", errors
         if postData['password'] != postData['confirmPW']:
             errors['confirm'] = "Password does not match confirm password"
             # print "errors at confirm:", errors
-        if len(User.objects.filter(email=postData['email'])) > 0:
-            errors['email2'] = "Email already registered"
-            # print "errors at email2", errors
-        if len(postData['DOB']) < 10:
-            errors['DOB'] = "Please enter your date of birth"
-            # print "DOB error:", errrors
         if errors:
             # print "Total errors:", errors
             return errors
         else:
             hashed = bcrypt.hashpw((postData['password'].encode()), bcrypt.gensalt(5))
             print hashed
-            new_user = {'new_user': 'Alpha'}
             new_user = self.create(
                 name=postData['name'],
-                alias=postData['alias'],
-                email=postData['email'],
+                username=postData['username'],
                 password=hashed,
-                DOB =postData['DOB'],
             )
             print "new_user:", new_user
         print "End Reg Manager"
         return new_user
 
+    # def date_validator(self):
+    # return date.today() > self.date
+        
+        
 
     def create_validator(self, postData, id):
-        # print postData
-        # print id
+        print "Start Create validator"
+        print "date.today():", date.today()
+        # 2018-02-02
+        print "postData['start_date']:", unicode(postData['start_date'])
+        # 1991-01-01
+        print "postData['end_date']:", postData['end_date']
+        # 1992-01-01
+        # dateValue = date( 2010, 5, 15 )   
+        # print "dateValue", dateValue
+        start_date = unicode(postData['start_date'])
+        date_today = unicode(date.today())
+        end_date = unicode(postData['end_date'])
         errors = {}
-        if len(postData['author']) < 3:
-            errors['author'] = "Author name must be at least 3"
-        if len(postData['content']) < 10:
-            errors['content'] = "Quote must be at least 10 characters"
+        if len(postData['description']) < 1:
+            errors['description'] = "Please provide a description"
+        if len(postData['destination']) < 1:
+            errors['destination'] = "Please provide a destination"
+        if len(postData['start_date']) < 8:
+            errors['start_date'] = "Please provide a start date"
+        if len(postData['end_date']) < 8:
+            errors['end_date'] = "Please provide an end date"
+        if start_date <= date_today:
+            errors['start_date'] = "Start date must be in the future"
+        if end_date < start_date:
+            errors['end_date'] = "End date must be after the start date"
         if errors:
-            print "Total Errors: ", errors 
+            print "Total Errors: ", errors
+            print "End Create Validator - Errors" 
             return errors
-        else:
-            new_quote = self.create(
-                content=postData['content'],
-                author=postData['author'],
-                user=User.objects.get(id=int(id)),
-
-            )
-            return new_quote
+        
+        new_trip = self.create(
+            destination=postData['destination'],
+            description=postData['description'],
+            user=User.objects.get(id=int(id)),
+            start_date=postData['start_date'],
+            end_date=postData['end_date'],
+        )
+        print "End Create Validator", new_trip
+        return new_trip
 
 class User(models.Model):
     print "Start User Model"
     name = models.CharField(max_length=255, blank=False)
-    alias = models.CharField(max_length=255, blank=False)
-    email = models.URLField(blank=False)
+    username = models.CharField(max_length=255, blank=False)
     password = models.CharField(max_length=255)
-    DOB = models.DateField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
     objects = UserManager()
 
     print "End User Model"
     def __unicode__(self):
-        return "id: " + str(self.id) + ", name: " + str(self.name) + ", alias: " + str(self.alias) + ", email: " + str(self.email) + ", password: " + str(self.password) + ", DOB: " + str(self.DOB)
+        return "id: " + str(self.id) + ", name: " + str(self.name) + ", username: " + str(self.username) + ", password: " + str(self.password) + ", created_at: " + str(self.created_at)
 
-class Quote(models.Model):
+# User.objects.create(name="Alpha", username="Alpha-Username", password=bcrypt.hashpw(('aaaaaaaa'.encode()), bcrypt.gensalt(5)))
+# <User: id: 16, name: Alpha, username: Alpha-Username, password: $2b$05$t1eteLK62j7SBX86jO2bou4QsBkmyCMq/r00xJ94qgIK/dzgM20eC>
+
+# User.objects.create(name="Bravo", username="Bravo-Username", password=bcrypt.hashpw(('bbbbbbbb'.encode()), bcrypt.gensalt(5)))
+# <User: id: 17, name: Bravo, username: Bravo-Username, password: $2b$05$RPLyuS52ZipTPoCikm6XzOMCa5Cq5r9xIKwRPbvPwg3SvJKOM9AA2>
+
+class Trip(models.Model):
     print "Start User Model"
-    content = models.CharField(max_length=255, blank=False)
-    author = models.CharField(max_length=255, blank=False)
-    user = models.ForeignKey(User, related_name="quotes", null=True)
-    faved_users = models.ManyToManyField(User, related_name="faved_quotes")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    destination = models.CharField(max_length=255, blank=False)
+    description = models.CharField(max_length=255, blank=False)
+    user = models.ForeignKey(User, related_name="trips", null=True)
+    trip_users = models.ManyToManyField(User, related_name="trip_trips")
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     objects = UserManager()
     print "End User Model"  
     def __unicode__(self):
-        return "id: " + str(self.id) + ", content: " + str(self.content) + ", author: " + str(self.author) + ", user: " + str(self.user)
+        return "id: " + str(self.id) + ", destination: " + str(self.destination) + ", description: " + str(self.description) + ", user: " + str(self.user) + ", start_date: " + str(self.start_date) + ", end_date: " + str(self.end_date)
+
+# Trip.objects.create(destination="Hong Kong", description="We're goin to the great wall", user=User.objects.get(id=16), start_date="2018-03-03", end_date="2018-04-04")
+
+# <Trip: id: 2, destination: Hong Kong, description: We're goin to the great wall, user: id: 16, name: Alpha, username: Alpha-Username, password: $2b$05$t1eteLK62j7SBX86jO2bou4QsBkmyCMq/r00xJ94qgIK/dzgM20eC, created_at: 2018-02-02, start_date: 2018-03-03, end_date: 2018-04-04>
+
+
+# Trip.objects.create(destination="The Zoo", description="We're goin to the zoo", user=User.objects.get(id=17), start_date="2018-03-03", end_date="2018-04-04")
+# <Trip: id: 3, destination: The Zoo, description: We're goin to the zoo, user: id: 17, name: Bravo, username: Bravo-Username, password: $2b$05$RPLyuS52ZipTPoCikm6XzOMCa5Cq5r9xIKwRPbvPwg3SvJKOM9AA2, created_at: 2018-02-02, start_date: 2018-03-03, end_date: 2018-04-04>
+
+# u = User.objects.get(id=17)
+# q = Trip.objects.get(id=2)
+# u.trip_trips.add(q)
+
+# u.trip_trips.all()
+
+# <QuerySet [<Trip: id: 2, destination: Hong Kong, description: We're goin to the great wall, user: id: 16, name: Alpha, username: Alpha-Username, password: $2b$05$t1eteLK62j7SBX86jO2bou4QsBkmyCMq/r00xJ94qgIK/dzgM20eC, created_at: 2018-02-02, start_date: 2018-03-03, end_date: 2018-04-04>]>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # this_quote = Quote.objects.get(id=2)
 # this_user = User.objects.get(id=6)
@@ -132,7 +202,6 @@ class Quote(models.Model):
 # 	updated_at = models.DateTimeField(auto_now=True)
 
 
-# User.objects.create(name="Alpha", alias="A-Alias", email="a@gmail.com", password=bcrypt.hashpw(('aaaaaaaa'.encode()), bcrypt.gensalt(5)), DOB="1991-01-01")
 
 # <User: id: 8, name: Alpha, alias: A-Alias, email: a@gmail.com, password: $2b$05$EVBNiDIDzGajcjH.WaYZI.4vuzy.dy2dydPP/BiZOvl85KDSwORpi, DOB: 1991-01-01>
 # a = User.objects.get(id=8)

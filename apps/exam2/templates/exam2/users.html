@@ -1,8 +1,14 @@
 <p><a href='/logout'>logout</a></p>
-<p><a href='/quotes'>Dashboard</a></p>
-<h1>Posts by {{user.name}}</h1>
+<p><a href='/travels'>Home</a></p>
 <br>
-{% for quote in quotes %}
-        {{quote.author}} - {{quote.content}} 
-        <hr>
-{% endfor %}
+<h1>{{trip.destination}}</h1>        
+<p>Planned By: {{trip.user.name}}</p>
+<p>Description: {{trip.description}}</p>
+<p>Travel Date From: {{trip.start_date}}</p>
+<p>Travel Date To: {{trip.end_date}}</p>
+<h1>Other Users Joining the Trip:</h1>
+{%for user in users%}
+{{user.name}}
+{%endfor%}
+
+
